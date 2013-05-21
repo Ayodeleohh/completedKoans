@@ -19,6 +19,15 @@
 #
 def triangle(a, b, c):
     # DELETE 'PASS' AND WRITE THIS CODE
+    sides = sorted([a,b,c])
+
+    if sides[0] <= 0:
+        raise TriangleError("No side can be zero or lower")
+
+    if sides[0] + sides[1] <= sides[2]:
+        raise TriangleError("No side be longer than the total length of the other two sides")
+        
+
     if (a == b) and (b == c):
         return 'equilateral'
     elif (a == b) or  (a == c) or (b == c) :

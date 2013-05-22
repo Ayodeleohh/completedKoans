@@ -35,8 +35,25 @@ from runner.koan import *
 
 def score(dice):
     # You need to write this method
-    pass
+    score = 0
 
+    import collections
+    occurrences = collections.Counter(dice)
+
+    while (occurrences[1] >= 3):
+        occurrences[1] -= 3
+        score += 1000
+
+    for number in occurrences:
+        while (occurrences[number] >= 3):
+            occurrences[number] -= 3
+            score += number * 100
+
+        if number == 1: score += occurrences[number] * 100
+
+        if number == 5: score += occurrences[number] * 50
+
+    return score
 
 class AboutScoringProject(Koan):
     def test_score_of_an_empty_list_is_zero(self):

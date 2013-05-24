@@ -20,13 +20,44 @@ from runner.koan import *
 
 
 class Proxy(object):
-    def __init__(self, target_object):
-        # WRITE CODE HERE
 
+    def __init__(self, target_object):
         #initialize '_obj' attribute last. Trust me on this!
+        self.logs = []
         self._obj = target_object
 
-    # WRITE CODE HERE
+    def __setattr__(self,name,value):
+        if hasattr(self,'_obj'):
+            self.logs.append(name)
+            object.__setattr__(object.__getattribute__(self,'_obj'),name,value)
+        else:
+            object.__setattr__(self,name,value)
+
+
+    def __getattr__(self,attrname):
+
+        if attrname not in dir(object.__getattribute__(self,'_obj')):
+            return object.__getattribute__(self,attrname)
+        else:
+            self.logs.append(attrname)
+            return object.__getattribute__((object.__getattribute__(self,'_obj')),attrname)
+
+    def messages(self):
+        return self.logs
+
+    def was_called(self,attrname):
+        if attrname in self.logs:
+            return True
+        else:
+            return False
+
+    def number_of_times_called(self,attrname):
+        if attrname in self.logs:
+            from collections import Counter
+            logscount = Counter(self.logs)
+            return logscount[attrname]
+        else:
+            return False
 
 
 # The proxy object should pass the following Koan:
@@ -35,6 +66,7 @@ class AboutProxyObjectProject(Koan):
     def test_proxy_method_returns_wrapped_object(self):
         # NOTE: The Television class is defined below
         tv = Proxy(Television())
+        print dir(tv)
 
         self.assertTrue(isinstance(tv, Proxy))
 
@@ -108,21 +140,17 @@ class Television(object):
     def __init__(self):
         self._channel = None
         self._power = None
-
     @property
     def channel(self):
         return self._channel
-
     @channel.setter
     def channel(self, value):
         self._channel = value
-
     def power(self):
         if self._power == 'on':
             self._power = 'off'
         else:
             self._power = 'on'
-
     def is_on(self):
         return self._power == 'on'
 
